@@ -12,9 +12,9 @@ export default function Footer() {
       <ul className="flex max-md:flex-col flex-wrap mt-10 ml-10 justify-between sm:px-16 px-6 py-10">
         <li className="flex items-center">
           <Image
-            src="/logoWhite.png"
+            src="/coolDogLogo.png"
             alt="logo"
-            width={228}
+            width={200}
             height={40}
             className="object-contain"
           />

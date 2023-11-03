@@ -59,9 +59,9 @@ export default function NavBar() {
       items-center sm:px-16 px-6 py-4 bg-transparent"
       >
         <Image
-          src="/Logo.png"
+          src="/coolDogLogo.png"
           alt="logo"
-          width={118}
+          width={60}
           height={18}
           className="object-contain"
         />
