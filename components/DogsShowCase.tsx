@@ -1,16 +1,14 @@
 "use client";
 
-import type { PaginationProps } from "antd";
-
 import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
 
-import { ConfigProvider, Pagination } from "antd";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import Hero from "../components/Hero";
+import Pagination from "../components/Pagination";
 import { useLikeContext } from "../contexts/LikeContext";
+import { chunkArray, arrayOfDogs } from "../lib/utils";
 import { Dogs } from "../types";
 import DogCard from "./DogCard";
 import DogDetails from "./MatchedDogCard";
@@ -18,64 +16,64 @@ import SearchBar from "./SearchBar";
 import { Button } from "./ui/button";
 
 export default function DogsShowCase() {
-  const router = useRouter();
   const { likedDogs, likedDogsIds } = useLikeContext();
-  const [breedToSearch, setBreedToSearch] = useState<string>("");
+  const [breedsToSearch, setBreedsToSearch] = useState<string[]>([]);
   const [matchDog, setMatchDog] = useState<Dogs | null>(null);
   const [dogsListBreedSearch, setdogsListBreedSearch] = useState<Dogs[] | null>(
     null
   );
 
-  const dog: Dogs = {
-    img: "https://frontend-take-home.fetch.com/dog-images/n02099712-Labrador_retriever/n02099712_1150.jpg",
-    name: "Monroe",
-    age: 13,
-    breed: "Labrador Retriever",
-    zip_code: "32159",
-    id: "CnGFTIcBOvEgQ5OCx68s",
-  };
-
   const [error, setError] = useState<string>("");
   const [sortDesc, setSortDesc] = useState<boolean>(true);
   const [postsPerPage, setPostsPerPage] = useState<number>(12);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
-    current,
-    pageSize
-  ) => {
-    setPostsPerPage(pageSize);
-  };
   // pagination states
-  const [number, setNumber] = useState<number>(1);
-  //   handle Pagination
-  const handlePage = (pageNumber: number) => {
-    const nextSection: HTMLElement | null = document.getElementById("discover");
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page") ?? "1";
+  const per_page = searchParams.get("per_page") ?? "12";
+  const start = (Number(page) - 1) * Number(per_page); // 0, 5, 10 ...
+  const end = start + Number(per_page); // 5, 10, 15 ...
 
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: "smooth" });
+  useEffect(() => {
+    if (searchParams.has("page")) {
+      const nextSection: HTMLElement | null =
+        document.getElementById("discover");
+
+      if (nextSection) {
+        nextSection.scrollIntoView({ behavior: "smooth" });
+      }
     }
-    setNumber(pageNumber);
-  };
+  }, [searchParams]);
 
   useEffect(() => {
     const getDogs = async () => {
       try {
-        const dogsIds = await axios.get(
-          `https://frontend-take-home-service.fetch.com/dogs/search?breeds=${breedToSearch}&size=100`,
-          {
-            withCredentials: true,
+        let apiUrlDogsIds =
+          "https://frontend-take-home-service.fetch.com/dogs/search?";
+        let size = breedsToSearch.length * 250;
+        let count = 0;
+        breedsToSearch.forEach((breed) => {
+          if (count > 0 && count < breedsToSearch.length) {
+            apiUrlDogsIds += `&breeds=${breed}`;
+            ++count;
+          } else {
+            apiUrlDogsIds += `breeds=${breed}`;
+            ++count;
           }
-        );
+        });
 
-        const dogs = await axios.post(
-          `https://frontend-take-home-service.fetch.com/dogs`,
-          dogsIds.data.resultIds,
-          {
-            withCredentials: true,
-          }
-        );
+        apiUrlDogsIds += `&size=${size}`;
 
-        const sortAlpha = dogs.data.sort((a: Dogs, b: Dogs) =>
+        const dogsIds = await axios.get(apiUrlDogsIds, {
+          withCredentials: true,
+        });
+        const chunkedIds = chunkArray(dogsIds.data.resultIds, 100);
+
+        let arrayDogs: Dogs[][] = await arrayOfDogs(chunkedIds);
+
+        const dogs = arrayDogs.flat();
+
+        const sortAlpha = dogs.sort((a: Dogs, b: Dogs) =>
           a.name.localeCompare(b.name)
         );
 
@@ -89,7 +87,7 @@ export default function DogsShowCase() {
       }
     };
     getDogs();
-  }, [breedToSearch]);
+  }, [breedsToSearch]);
 
   const isDataEmpty =
     !Array.isArray(dogsListBreedSearch) ||
@@ -99,10 +97,7 @@ export default function DogsShowCase() {
   let newData;
 
   if (!isDataEmpty) {
-    newData = dogsListBreedSearch.slice(
-      (number - 1) * postsPerPage,
-      postsPerPage * number
-    );
+    newData = dogsListBreedSearch.slice(start, end);
   }
 
   const orderDogList = () => {
@@ -134,10 +129,8 @@ export default function DogsShowCase() {
           withCredentials: true,
         }
       );
-      console.log(dogId);
       if (dogId) {
         const matchDog = likedDogs.filter((dog) => dog.id === dogId.data.match);
-        console.log(matchDog[0]);
         setMatchDog(matchDog[0]);
         setIsOpen(true);
       }
@@ -169,7 +162,7 @@ export default function DogsShowCase() {
           </p>
         </section>
         <section className="flex flex-col xl:flex-row  mt-12 w-full gap-10">
-          <SearchBar setBreedToSearch={setBreedToSearch} />
+          <SearchBar setBreedsToSearch={setBreedsToSearch} />
 
           <div className="ml-5 mt-1">
             <Button
@@ -192,7 +185,7 @@ export default function DogsShowCase() {
                grid-cols-1 w-full gap-8 pt-14 "
               >
                 {newData?.map((dog) => (
-                  <div key={dog.id} className="">
+                  <ul key={dog.id} className="">
                     <DogCard
                       imgSrc={dog.img}
                       imgAlt={`${dog.name} Picture `}
@@ -202,37 +195,15 @@ export default function DogsShowCase() {
                       zipCode={dog.zip_code}
                       id={dog.id}
                     />
-                  </div>
+                  </ul>
                 ))}
               </div>
               <div className="flex justify-center mt-9">
-                <ConfigProvider
-                  theme={{
-                    components: {
-                      Pagination: {
-                        itemActiveBg: "light-purple",
-                      },
-                    },
-                    token: {
-                      colorText: "#3F1D38",
-                      colorPrimary: "#5D12D2",
-                    },
-                  }}
-                >
-                  <Pagination
-                    defaultCurrent={number}
-                    responsive={true}
-                    onShowSizeChange={onShowSizeChange}
-                    pageSizeOptions={[12, 24, 48, 100]}
-                    defaultPageSize={12}
-                    showTotal={(total, range) =>
-                      `${range[0]}-${range[1]} of ${total} items`
-                    }
-                    total={dogsListBreedSearch.length}
-                    onChange={handlePage}
-                    className="flex flex-row justify-center"
-                  />
-                </ConfigProvider>
+                <Pagination
+                  hasNextPage={end < dogsListBreedSearch.length}
+                  hasPrevPage={start > 0}
+                  numberOfDogs={dogsListBreedSearch.length}
+                />
               </div>
             </section>
           ) : (
