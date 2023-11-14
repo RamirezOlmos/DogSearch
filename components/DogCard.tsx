@@ -98,7 +98,8 @@ const NewCard = ({
           src={imgSrc}
           alt={imgAlt}
           fill
-          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority={true}
           className="object-contain"
         />
       </div>
@@ -144,11 +145,11 @@ const NewCard = ({
                   testLike ? "fill-violet-400" : "fill-slate-400"
                 } hover:fill-red-900`}
               >
-                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                 <g
                   id="SVGRepo_tracerCarrier"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 ></g>
                 <g id="SVGRepo_iconCarrier">
                   {" "}
