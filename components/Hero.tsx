@@ -48,7 +48,7 @@ const Hero = () => {
             width={590}
             height={590}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-contain w-full h-full xl:mt-44 xl:ml-4"
+            className="responsive object-contain w-full h-full xl:mt-44 xl:ml-4"
           />
         </div>
       </section>
