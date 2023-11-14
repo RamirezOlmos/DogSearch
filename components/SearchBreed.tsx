@@ -1,6 +1,7 @@
 import { Fragment, useState, useEffect } from "react";
 
 import { Combobox, Transition } from "@headlessui/react";
+import { ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import axios from "axios";
 import { CheckIcon } from "lucide-react";
 import Image from "next/image";
@@ -11,7 +12,6 @@ const SearchBreed = ({
   breedsToSearch,
   setBreedsToSearch,
 }: SearchBreedProps) => {
-  // const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
   const [breeds, setBreeds] = useState<string[]>([]);
   const [query, setQuery] = useState<string>("");
 
@@ -51,13 +51,17 @@ const SearchBreed = ({
       >
         <div className="relative w-full">
           {/* Button for the combobox. Click on the icon to see the complete dropdown */}
-          <Combobox.Button className="absolute top-[14px]">
-            <Image
+          <Combobox.Button className="absolute top-[14px] text-center">
+            {/* <Image
               src="/dropdown.png"
               width={20}
               height={20}
               className="ml-4"
-              alt="car logo"
+              alt="dropdown icon"
+            /> */}
+            <ChevronUpDownIcon
+              className="h-5 w-8 text-orange-400"
+              aria-hidden="true"
             />
           </Combobox.Button>
 
