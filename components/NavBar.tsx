@@ -55,7 +55,7 @@ export default function NavBar() {
       } text-fetch w-full fixed top-0 left-0 z-10`}
     >
       <nav
-        className="max-w-[1440px] mx-auto flex justify-between 
+        className="relative max-w-[1440px] mx-auto flex justify-between 
       items-center sm:px-16 px-6 py-4 bg-transparent"
       >
         <Image
