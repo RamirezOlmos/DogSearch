@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import SearchBreed from "./SearchBreed";
 
 interface SearchBar {
-  setBreedToSearch: Dispatch<SetStateAction<string>>;
+  setBreedsToSearch: Dispatch<SetStateAction<string[]>>;
 }
 
 const SearchButton = ({ otherClasses }: { otherClasses: string }) => (
@@ -24,31 +24,31 @@ const SearchButton = ({ otherClasses }: { otherClasses: string }) => (
 );
 
 const SearchBar = (props: SearchBar) => {
-  const { setBreedToSearch } = props;
-  const [breed, setBreed] = useState<string>("");
+  const { setBreedsToSearch } = props;
+  const [breeds, setBreeds] = useState<string[]>([]);
   const router = useRouter();
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (breed.trim() === "") {
+    if (breeds.length === 0) {
       return alert("Please provide some input");
     }
 
-    setBreedToSearch(breed);
+    setBreedsToSearch(breeds);
 
-    updateSearchParams(breed.toLowerCase());
+    // updateSearchParams(breeds);
   };
 
-  const updateSearchParams = (breed: string) => {
+  const updateSearchParams = (breeds: string[]) => {
     // Create a new URLSearchParams object using the current URL search parameters
     const searchParams = new URLSearchParams(window.location.search);
 
     // Update or delete the 'breed' search parameter based on the 'breed' value
-    if (breed) {
-      searchParams.set("breed", breed);
+    if (breeds.length != 0) {
+      // searchParams.set("breeds", breeds);
     } else {
-      searchParams.delete("breed");
+      searchParams.delete("breeds");
     }
 
     // Generate the new pathname with the updated search parameters
@@ -69,7 +69,7 @@ const SearchBar = (props: SearchBar) => {
         className="flex-1 max-sm:w-full flex justify-start items-center
        relative"
       >
-        <SearchBreed breed={breed} setBreed={setBreed} />
+        <SearchBreed breedsToSearch={breeds} setBreedsToSearch={setBreeds} />
         <SearchButton otherClasses="sm:hidden" />
       </div>
       <SearchButton otherClasses="max-sm:hidden" />

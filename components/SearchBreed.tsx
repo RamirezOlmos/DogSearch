@@ -2,13 +2,18 @@ import { Fragment, useState, useEffect } from "react";
 
 import { Combobox, Transition } from "@headlessui/react";
 import axios from "axios";
+import { CheckIcon } from "lucide-react";
 import Image from "next/image";
 
 import { SearchBreedProps } from "../types";
 
-const SearchBreed = ({ breed, setBreed }: SearchBreedProps) => {
-  const [query, setQuery] = useState<string>("");
+const SearchBreed = ({
+  breedsToSearch,
+  setBreedsToSearch,
+}: SearchBreedProps) => {
+  // const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
   const [breeds, setBreeds] = useState<string[]>([]);
+  const [query, setQuery] = useState<string>("");
 
   useEffect(() => {
     const getBreeds = async () => {
@@ -39,12 +44,16 @@ const SearchBreed = ({ breed, setBreed }: SearchBreedProps) => {
 
   return (
     <div className="flex-1 max-sm:w-full flex justify-start items-center">
-      <Combobox value={breed} onChange={setBreed}>
+      <Combobox
+        value={breedsToSearch}
+        onChange={(v) => setBreedsToSearch(v)}
+        multiple
+      >
         <div className="relative w-full">
           {/* Button for the combobox. Click on the icon to see the complete dropdown */}
           <Combobox.Button className="absolute top-[14px]">
             <Image
-              src="/dogLogo.svg"
+              src="/dropdown.png"
               width={20}
               height={20}
               className="ml-4"
@@ -56,8 +65,10 @@ const SearchBreed = ({ breed, setBreed }: SearchBreedProps) => {
           <Combobox.Input
             className="w-full h-[48px] pl-12 p-4 rounded-l-full rounded-full 
             bg-light-white outline-none cursor-pointer text-sm"
-            displayValue={(item: string) => item}
-            onChange={(event) => setQuery(event.target.value)} // Update the search query when the input changes
+            displayValue={(breeds: string[]) =>
+              breeds.map((breed) => breed).join(", ")
+            }
+            onChange={(event) => setQuery(event.target.value)}
             placeholder="Yorkshire Terrier..."
           />
 
@@ -101,7 +112,9 @@ const SearchBreed = ({ breed, setBreed }: SearchBreedProps) => {
                           className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
                             active ? "text-white" : "text-pribg-primary-purple"
                           }`}
-                        ></span>
+                        >
+                          <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                        </span>
                       ) : null}
                     </>
                   )}
