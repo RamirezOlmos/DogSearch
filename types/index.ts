@@ -1,6 +1,6 @@
 export interface SearchBreedProps {
-  breed: string;
-  setBreed: (breed: string) => void;
+  breedsToSearch: string[];
+  setBreedsToSearch: (breeds: string[]) => void;
 }
 
 export interface OptionProps {
