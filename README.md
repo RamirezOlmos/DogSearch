@@ -1,3 +1,11 @@
+Hi!
+
+If you want to visit the deploy app here is the link: https://dog-search-eta.vercel.app/
+
+To run it in your computer follow the instructions below.
+
+Cheers!
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
