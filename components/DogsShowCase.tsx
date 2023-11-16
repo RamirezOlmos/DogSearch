@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 
 import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 
 import Hero from "../components/Hero";
 import Pagination from "../components/Pagination";
@@ -22,10 +23,10 @@ export default function DogsShowCase() {
   const [dogsListBreedSearch, setdogsListBreedSearch] = useState<Dogs[] | null>(
     null
   );
+  const [fetchingData, setFetchingData] = useState<boolean>(false);
 
   const [error, setError] = useState<string>("");
   const [sortDesc, setSortDesc] = useState<boolean>(true);
-  const [postsPerPage, setPostsPerPage] = useState<number>(12);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   // pagination states
   const searchParams = useSearchParams();
@@ -78,6 +79,7 @@ export default function DogsShowCase() {
         );
 
         setdogsListBreedSearch(sortAlpha);
+        setFetchingData(false);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           setError(error.message);
@@ -162,7 +164,10 @@ export default function DogsShowCase() {
           </p>
         </section>
         <section className="flex flex-col xl:flex-row  mt-12 w-full gap-10">
-          <SearchBar setBreedsToSearch={setBreedsToSearch} />
+          <SearchBar
+            setBreedsToSearch={setBreedsToSearch}
+            setFetchingData={setFetchingData}
+          />
 
           <div className="ml-5 mt-1">
             <Button
@@ -182,7 +187,7 @@ export default function DogsShowCase() {
             <section>
               <div
                 className="grid 2xl:grid-cols-4 xl:grid-cols-3 md:grid-cols-2
-               grid-cols-1 w-full gap-8 pt-14 "
+                  grid-cols-1 w-full gap-8 pt-14 "
               >
                 {newData?.map((dog) => (
                   <ul key={dog.id} className="">
@@ -206,6 +211,17 @@ export default function DogsShowCase() {
                 />
               </div>
             </section>
+          ) : fetchingData ? (
+            <div className="mt-16 flex justify-center items-center">
+              <Image
+                src="/loadingDog.gif"
+                alt="Loading Dog"
+                width={250}
+                height={250}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="rounded-3xl responsive object-contain"
+              />
+            </div>
           ) : (
             <div className="mt-16 flex justify-center items-center flex-col gap-2">
               <h2 className="text-black text-xl font-bold">Oops, no results</h2>
