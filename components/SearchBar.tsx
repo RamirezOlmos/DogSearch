@@ -3,12 +3,12 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 import SearchBreed from "./SearchBreed";
 
 interface SearchBar {
   setBreedsToSearch: Dispatch<SetStateAction<string[]>>;
+  setFetchingData: Dispatch<SetStateAction<boolean>>;
 }
 
 const SearchButton = ({ otherClasses }: { otherClasses: string }) => (
@@ -24,9 +24,8 @@ const SearchButton = ({ otherClasses }: { otherClasses: string }) => (
 );
 
 const SearchBar = (props: SearchBar) => {
-  const { setBreedsToSearch } = props;
+  const { setBreedsToSearch, setFetchingData } = props;
   const [breeds, setBreeds] = useState<string[]>([]);
-  const router = useRouter();
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,27 +35,7 @@ const SearchBar = (props: SearchBar) => {
     }
 
     setBreedsToSearch(breeds);
-
-    // updateSearchParams(breeds);
-  };
-
-  const updateSearchParams = (breeds: string[]) => {
-    // Create a new URLSearchParams object using the current URL search parameters
-    const searchParams = new URLSearchParams(window.location.search);
-
-    // Update or delete the 'breed' search parameter based on the 'breed' value
-    if (breeds.length != 0) {
-      // searchParams.set("breeds", breeds);
-    } else {
-      searchParams.delete("breeds");
-    }
-
-    // Generate the new pathname with the updated search parameters
-    const newPathname = `${
-      window.location.pathname
-    }?${searchParams.toString()}`;
-
-    // router.push(newPathname);
+    setFetchingData(true);
   };
 
   return (
